@@ -1,48 +1,93 @@
 package com.heyx.jsoup.service;
 
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.springframework.stereotype.Service;
+import com.heyx.jsoup.dao.BaseRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * @description:
- * @author: heyx
- * @create: 2019-04-11 18:25
- * @email; 1064042411@qq.com
- */
-@Service
-public class BaseService {
+public class BaseService<T, ID extends Serializable> {
+    @Autowired
+    BaseRepo<T, ID> repository;
 
-
-    public void parseDocument(Document doc){
-        if (null == doc){
-            System.out.println("文件不存在~");
-        }
-
-        Element body = doc.body();
-        Elements element = body.getElementsByClass("kj_tablelist02");
-        Elements tbody = element.select("table").select("tbody");
-        Elements trs = tbody.select("table").select("tr");
-        Element tr1 = trs.first();
-        Element tr2 = trs.last();
-
-        System.out.println(getNameByTR(tr1).get(0));
-        System.out.println(tr2.select("td").last().text());
+    public List<T> findAll() {
+        return repository.findAll();
     }
 
-
-
-    private List<String> getNameByTR(Element element){
-        List<String> nameList = new ArrayList<>();
-        Elements blues = element.getElementsByClass("ball_blue");
-        for (Element blue : blues) {
-            nameList.add(blue.text());
-        }
-
-        return nameList;
+    public List<T> findAll(Sort sort) {
+        return repository.findAll(sort);
     }
+
+    public Page<T> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    public List<T> findAll(Specification<T> specification) {
+        return repository.findAll(specification);
+    }
+
+    public Page<T> findAll(Specification<T> specification, Pageable pageable) {
+        return repository.findAll(specification, pageable);
+    }
+
+    public List<T> findAll(Specification<T> specification, Sort sort) {
+        return repository.findAll(specification, sort);
+    }
+
+    public Optional<T> findById(ID id) {
+        if (null == id || "".equals(id)) {
+            return Optional.empty();
+        }
+        return repository.findById(id);
+    }
+
+    public T getOne(ID id) {
+        return repository.getOne(id);
+    }
+
+    public <S extends T> S save(S s) {
+        return repository.save(s);
+    }
+
+    public <S extends T> S saveAndFlush(S s) {
+        return repository.saveAndFlush(s);
+    }
+
+    public <S extends T> List<S> saveAll(Iterable<S> iterable) {
+        return repository.saveAll(iterable);
+    }
+
+    public void flush() {
+        repository.flush();
+    }
+
+    public void deleteById(ID id) throws Exception {
+        repository.deleteById(id);
+    }
+
+    public void delete(T t) {
+        repository.delete(t);
+    }
+
+    public void deleteAll(Iterable<? extends T> iterable) {
+        repository.deleteAll(iterable);
+    }
+
+    public void deleteAll() {
+        repository.deleteAll();
+    }
+
+    public void deleteInBatch(Iterable<T> iterable) {
+        repository.deleteInBatch(iterable);
+    }
+
+    public void deleteAllInBatch() {
+        repository.deleteAllInBatch();
+    }
+
 }
