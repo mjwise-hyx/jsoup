@@ -6,6 +6,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class JsoupService {
     }
 
 
-    public void parseDocument(Document doc){
+    public List<String> parseDocument(Document doc){
         assert doc != null;
         Element body = doc.body();
         Elements element = body.getElementsByClass("kj_tablelist02");
@@ -33,9 +34,12 @@ public class JsoupService {
         Elements trs = tbody.select("table").select("tr");
         Element tr1 = trs.first();
         Element tr2 = trs.last();
-
-        System.out.println(getNameByTR(tr1).get(0));
-        System.out.println(tr2.select("td").last().text());
+        List<String> strings = new ArrayList<>();
+        strings.add(getNameByTR(tr1).get(0));
+        String red = tr2.select("td").last().text();
+        String[] reds = red.split(" ");
+        strings.addAll(Arrays.asList(reds));
+        return strings;
     }
 
 
