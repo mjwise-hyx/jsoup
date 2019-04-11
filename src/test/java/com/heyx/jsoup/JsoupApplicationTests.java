@@ -36,8 +36,9 @@ public class JsoupApplicationTests {
     @Test
     public void contextLoads() throws IOException {
         Document doc = Jsoup.connect("http://kaijiang.500.com/ssq.shtml").get();
-        jsoupService.parseDocument(doc);
-        jsoupService.parseDocumentToURl(doc);
+        List<String>strings = jsoupService.parseDocument(doc);
+//        jsoupService.parseDocumentToURl(doc);
+        System.out.println(strings);
     }
 
     @Test
