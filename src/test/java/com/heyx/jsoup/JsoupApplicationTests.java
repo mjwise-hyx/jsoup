@@ -4,6 +4,7 @@ import com.heyx.jsoup.entity.Address;
 import com.heyx.jsoup.entity.History;
 import com.heyx.jsoup.entity.Socks;
 import com.heyx.jsoup.service.AddressService;
+import com.heyx.jsoup.service.HistoryService;
 import com.heyx.jsoup.service.JsoupService;
 import com.heyx.jsoup.service.SocksSerivce;
 import org.jsoup.Jsoup;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 
@@ -33,11 +33,15 @@ public class JsoupApplicationTests {
     @Autowired
     AddressService addressService;
 
+    @Autowired
+    HistoryService historyService;
+
     @Test
     public void contextLoads() throws IOException {
         Document doc = Jsoup.connect("http://kaijiang.500.com/ssq.shtml").get();
-        jsoupService.parseDocument(doc);
-        jsoupService.parseDocumentToURl(doc);
+        List<String>strings = jsoupService.parseDocument(doc);
+//        jsoupService.parseDocumentToURl(doc);
+        System.out.println(strings);
     }
 
     @Test
@@ -57,18 +61,25 @@ public class JsoupApplicationTests {
     public void addHistory() throws IOException {
         List<Address> addressList = addressService.findAll();
         for (Address address : addressList) {
-            Document doc = Jsoup.connect(address.getUrl()).get();
-            List<String> strings = jsoupService.parseDocument(doc);
-            History history = new History();
-            history.setBule(strings.get(0));
-            history.setNum1(strings.get(1));
-            history.setNum2(strings.get(2));
-            history.setNum3(strings.get(3));
-            history.setNum4(strings.get(4));
-            history.setNum5(strings.get(5));
-            history.setNum6(strings.get(5));
-            history.setNum7(strings.get(7));
-            System.out.println(history);
+            if (!historyService.existsByCode(address.getCode())){
+                Document doc = Jsoup.connect(address.getUrl()).get();
+                List<String> strings = jsoupService.parseDocument(doc);
+                if (7 == strings.size()){
+                    History history = new History();
+                    history.setCode(address.getCode());
+                    history.setBule(strings.get(0));
+                    history.setNum1(strings.get(1));
+                    history.setNum2(strings.get(2));
+                    history.setNum3(strings.get(3));
+                    history.setNum4(strings.get(4));
+                    history.setNum5(strings.get(5));
+                    history.setNum6(strings.get(6));
+
+                    historyService.save(history);
+                }
+
+            }
+
         }
     }
 
@@ -78,6 +89,16 @@ public class JsoupApplicationTests {
         Socks socks = new Socks("定时任务一", "0/5 * * * * ?");
         socks = socksSerivce.save(socks);
         System.out.println(socks);
+    }
+
+    @Test
+    public void checkCode(){
+        List<Address> addresses = addressService.findAll();
+        for (Address address : addresses) {
+            if (!historyService.existsByCode(address.getCode())){
+                System.out.println(address.getCode());
+            }
+        }
     }
 
 }

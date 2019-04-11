@@ -1,6 +1,8 @@
 package com.heyx.jsoup.service;
 
+import com.heyx.jsoup.dao.HistoryRepo;
 import com.heyx.jsoup.entity.History;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,4 +13,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class HistoryService extends BaseService<History, String>{
+    @Autowired
+    HistoryRepo historyRepo;
+
+    public boolean existsByCode(String code) {
+        return historyRepo.existsByCode(code);
+    }
 }

@@ -47,8 +47,6 @@ public class History {
     @Column
     private String num6;
 
-    @Column
-    private String num7;
 
     @Column
     private String bule;
@@ -56,7 +54,7 @@ public class History {
     public History() {
     }
 
-    public History(String code, String num1, String num2, String num3, String num4, String num5, String num6, String num7, String bule) {
+    public History(String code, String num1, String num2, String num3, String num4, String num5, String num6, String bule) {
         this.code = code;
         this.num1 = num1;
         this.num2 = num2;
@@ -64,7 +62,6 @@ public class History {
         this.num4 = num4;
         this.num5 = num5;
         this.num6 = num6;
-        this.num7 = num7;
         this.bule = bule;
     }
 
@@ -132,19 +129,26 @@ public class History {
         this.num6 = num6;
     }
 
-    public String getNum7() {
-        return num7;
-    }
-
-    public void setNum7(String num7) {
-        this.num7 = num7;
-    }
-
     public String getBule() {
         return bule;
     }
 
     public void setBule(String bule) {
         this.bule = bule;
+    }
+
+    @Override
+    public String toString() {
+        return "History{" +
+                "id='" + id + '\'' +
+                ", code='" + code + '\'' +
+                ", num1='" + num1 + '\'' +
+                ", num2='" + num2 + '\'' +
+                ", num3='" + num3 + '\'' +
+                ", num4='" + num4 + '\'' +
+                ", num5='" + num5 + '\'' +
+                ", num6='" + num6 + '\'' +
+                ", bule='" + bule + '\'' +
+                '}';
     }
 }

@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface HistoryRepo extends BaseRepo<History,String> {
+    boolean existsByCode(String code);
 }
