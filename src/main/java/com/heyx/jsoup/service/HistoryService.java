@@ -19,4 +19,6 @@ public class HistoryService extends BaseService<History, String>{
     public boolean existsByCode(String code) {
         return historyRepo.existsByCode(code);
     }
+
+
 }
