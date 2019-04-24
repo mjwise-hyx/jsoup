@@ -28,4 +28,36 @@ public class Layer {
      */
     @Column
     private Integer nodeNum;
+
+    public Layer() {
+    }
+
+    public Layer(Network network, Integer nodeNum) {
+        this.network = network;
+        this.nodeNum = nodeNum;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Network getNetwork() {
+        return network;
+    }
+
+    public void setNetwork(Network network) {
+        this.network = network;
+    }
+
+    public Integer getNodeNum() {
+        return nodeNum;
+    }
+
+    public void setNodeNum(Integer nodeNum) {
+        this.nodeNum = nodeNum;
+    }
 }
