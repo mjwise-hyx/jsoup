@@ -1,6 +1,7 @@
-package com.heyx.jsoup.dao;
+package com.heyx.jsoup.dao.dot;
 
-import com.heyx.jsoup.entity.History;
+import com.heyx.jsoup.dao.BaseRepo;
+import com.heyx.jsoup.entity.dot.History;
 import org.springframework.stereotype.Repository;
 
 /**

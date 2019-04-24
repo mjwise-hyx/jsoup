@@ -1,12 +1,12 @@
 package com.heyx.jsoup;
 
-import com.heyx.jsoup.entity.Address;
-import com.heyx.jsoup.entity.History;
-import com.heyx.jsoup.entity.Socks;
-import com.heyx.jsoup.service.AddressService;
-import com.heyx.jsoup.service.HistoryService;
-import com.heyx.jsoup.service.JsoupService;
-import com.heyx.jsoup.service.SocksSerivce;
+import com.heyx.jsoup.entity.dot.Address;
+import com.heyx.jsoup.entity.dot.History;
+import com.heyx.jsoup.entity.dot.Socks;
+import com.heyx.jsoup.service.dot.AddressService;
+import com.heyx.jsoup.service.dot.HistoryService;
+import com.heyx.jsoup.service.dot.JsoupService;
+import com.heyx.jsoup.service.dot.SocksSerivce;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -98,6 +98,15 @@ public class JsoupApplicationTests {
             if (!historyService.existsByCode(address.getCode())){
                 System.out.println(address.getCode());
             }
+        }
+    }
+
+    @Test
+    public void convertHistory(){
+
+        List<History> histories = historyService.findAll();
+        for (History history : histories) {
+            System.out.println(history.toString());
         }
     }
 

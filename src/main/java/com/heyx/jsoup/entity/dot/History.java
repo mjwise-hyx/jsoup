@@ -1,4 +1,4 @@
-package com.heyx.jsoup.entity;
+package com.heyx.jsoup.entity.dot;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.context.annotation.Configuration;

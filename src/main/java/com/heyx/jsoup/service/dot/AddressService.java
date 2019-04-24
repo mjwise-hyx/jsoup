@@ -1,7 +1,8 @@
-package com.heyx.jsoup.service;
+package com.heyx.jsoup.service.dot;
 
-import com.heyx.jsoup.dao.AddressRepo;
-import com.heyx.jsoup.entity.Address;
+import com.heyx.jsoup.dao.dot.AddressRepo;
+import com.heyx.jsoup.entity.dot.Address;
+import com.heyx.jsoup.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

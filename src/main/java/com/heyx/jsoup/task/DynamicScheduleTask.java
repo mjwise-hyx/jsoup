@@ -1,7 +1,7 @@
 package com.heyx.jsoup.task;
 
-import com.heyx.jsoup.entity.Socks;
-import com.heyx.jsoup.service.SocksSerivce;
+import com.heyx.jsoup.entity.dot.Socks;
+import com.heyx.jsoup.service.dot.SocksSerivce;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
