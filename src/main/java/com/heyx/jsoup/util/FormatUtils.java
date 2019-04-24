@@ -36,7 +36,6 @@ public class FormatUtils {
 
     public static String printBytes(byte[][] bytes) {
         StringBuilder result = new StringBuilder();
-        int matrixLenth = bytes.length;
         for (byte[] b : bytes) {
             result.append(bytesTobit(b, false));
             result.append("\n");
