@@ -37,6 +37,12 @@ public class Network {
     @Column
     private Integer layerNum;
 
+    /**
+     * 正确率
+     */
+    @Column
+    private Double rightRate;
+
     public Network() {
     }
 
@@ -76,5 +82,13 @@ public class Network {
 
     public void setLayerNum(Integer layerNum) {
         this.layerNum = layerNum;
+    }
+
+    public Double getRightRate() {
+        return rightRate;
+    }
+
+    public void setRightRate(Double rightRate) {
+        this.rightRate = rightRate;
     }
 }
