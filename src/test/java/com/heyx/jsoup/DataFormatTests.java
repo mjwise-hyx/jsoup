@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -35,7 +36,10 @@ public class DataFormatTests {
 
 
             byte[] simple = historyService.convertToSampleMatrix(historyOptional.get());
-            System.out.println(FormatUtils.bytesTobit(simple,false));
+            String simple_format = FormatUtils.bytesTobit(simple,false).replace(" ","");
+            System.out.println(simple_format.length());
+            System.out.println(simple_format);
+
             History history = historyService.convertToHistory(simple, "1111");
             System.out.println(history.toString());
         }

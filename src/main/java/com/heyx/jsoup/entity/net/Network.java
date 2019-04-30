@@ -1,5 +1,6 @@
 package com.heyx.jsoup.entity.net;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -20,36 +21,33 @@ public class Network {
     private String id;
 
     /**
-     * 摘要值
-     */
-    @Column
-    private String md5;
-
-    /**
      * 迭代次数
      */
     @Column
-    private Integer trainNum;
+    @ColumnDefault("INT default 0")
+    private Integer trainNum = 0;
 
     /**
      * 层个数
      */
     @Column
-    private Integer layerNum;
+    @ColumnDefault("INT default 0")
+    private Integer layerNum = 0;
 
     /**
      * 正确率
      */
     @Column
-    private Double rightRate;
+    @ColumnDefault("DOUBLE default 0.0")
+    private Double rightRate = 0.0;
 
     public Network() {
     }
 
-    public Network(String md5, Integer trainNum, Integer layerNum) {
-        this.md5 = md5;
+    public Network(Integer trainNum, Integer layerNum, Double rightRate) {
         this.trainNum = trainNum;
         this.layerNum = layerNum;
+        this.rightRate = rightRate;
     }
 
     public String getId() {
@@ -58,14 +56,6 @@ public class Network {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getMd5() {
-        return md5;
-    }
-
-    public void setMd5(String md5) {
-        this.md5 = md5;
     }
 
     public Integer getTrainNum() {

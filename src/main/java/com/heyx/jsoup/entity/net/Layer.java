@@ -1,5 +1,6 @@
 package com.heyx.jsoup.entity.net;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -24,16 +25,32 @@ public class Layer {
     private Network network;
 
     /**
+     * 上一层 id
+     */
+    @Column
+    private String parentId;
+
+    /**
+     * 边的数量
+     */
+    @Column
+    @ColumnDefault("INT default 0")
+    private Integer lineNum = 0;
+
+    /**
      * 节点个数
      */
     @Column
-    private Integer nodeNum;
+    @ColumnDefault("INT default 0")
+    private Integer nodeNum = 0;
 
     public Layer() {
     }
 
-    public Layer(Network network, Integer nodeNum) {
+    public Layer(Network network, String parentId, Integer lineNum, Integer nodeNum) {
         this.network = network;
+        this.parentId = parentId;
+        this.lineNum = lineNum;
         this.nodeNum = nodeNum;
     }
 
@@ -43,6 +60,22 @@ public class Layer {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public Integer getLineNum() {
+        return lineNum;
+    }
+
+    public void setLineNum(Integer lineNum) {
+        this.lineNum = lineNum;
     }
 
     public Network getNetwork() {

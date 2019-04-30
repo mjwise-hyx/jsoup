@@ -1,5 +1,6 @@
 package com.heyx.jsoup.entity.net;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -24,27 +25,23 @@ public class Node {
      * 顺序
      */
     @Column
-    private Integer size;
-
-    /**
-     * 节点类型
-     */
-    @Column
-    private String type;
+    @ColumnDefault("INT default 0")
+    private Integer size = 0;
 
     /**
      * 偏置
      */
     @Column
-    private Integer bias;
+    @ColumnDefault("INT default 0")
+    private Integer bias = 0;
 
     public Node() {
     }
 
-    public Node(Layer layer, Integer size, String type) {
+    public Node(Layer layer, Integer size, Integer bias) {
         this.layer = layer;
         this.size = size;
-        this.type = type;
+        this.bias = bias;
     }
 
     public String getId() {
@@ -71,11 +68,11 @@ public class Node {
         this.size = size;
     }
 
-    public String getType() {
-        return type;
+    public Integer getBias() {
+        return bias;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setBias(Integer bias) {
+        this.bias = bias;
     }
 }
