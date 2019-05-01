@@ -1,17 +1,14 @@
 package com.heyx.jsoup.entity.net;
 
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * 神经网络
  */
 @Entity
+@Table(name = "net_network")
 public class Network {
 
     @Id
@@ -23,22 +20,19 @@ public class Network {
     /**
      * 迭代次数
      */
-    @Column
-    @ColumnDefault("INT default 0")
+    @Column(columnDefinition = "INTEGER default 0")
     private Integer trainNum = 0;
 
     /**
      * 层个数
      */
-    @Column
-    @ColumnDefault("INT default 0")
+    @Column(columnDefinition = "INTEGER default 0")
     private Integer layerNum = 0;
 
     /**
      * 正确率
      */
-    @Column
-    @ColumnDefault("DOUBLE default 0.0")
+    @Column(columnDefinition = "DOUBLE default 0.0")
     private Double rightRate = 0.0;
 
     public Network() {

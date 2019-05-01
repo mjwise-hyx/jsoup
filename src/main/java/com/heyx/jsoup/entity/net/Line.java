@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "net_line")
 public class Line {
 
     @Id
@@ -30,7 +31,7 @@ public class Line {
     /**
      * 偏置放大 1000 倍
      */
-    @Column
+    @Column(columnDefinition = "INTEGER default 0")
     private Integer weight;
 
     public Line() {
@@ -72,5 +73,15 @@ public class Line {
 
     public void setWeight(Integer weight) {
         this.weight = weight;
+    }
+
+    @Override
+    public String toString() {
+        return "Line{" +
+                "id='" + id + '\'' +
+                ", input=" + input +
+                ", output=" + output +
+                ", weight=" + weight +
+                '}';
     }
 }

@@ -1,11 +1,11 @@
 package com.heyx.jsoup.entity.net;
 
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
 @Entity
+@Table(name = "net_node")
 public class Node {
 
     @Id
@@ -24,15 +24,13 @@ public class Node {
     /**
      * 顺序
      */
-    @Column
-    @ColumnDefault("INT default 0")
+    @Column(columnDefinition = "INTEGER default 0")
     private Integer size = 0;
 
     /**
      * 偏置
      */
-    @Column
-    @ColumnDefault("INT default 0")
+    @Column(columnDefinition = "INTEGER default 0")
     private Integer bias = 0;
 
     public Node() {

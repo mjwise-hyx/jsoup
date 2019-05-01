@@ -1,6 +1,5 @@
 package com.heyx.jsoup.entity.net;
 
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -9,12 +8,13 @@ import javax.persistence.*;
  * 神经层
  */
 @Entity
+@Table(name = "net_layer")
 public class Layer {
 
     @Id
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @GeneratedValue(generator = "uuid")
-    @Column(name = "id", length = 64)
+    @Column(name = "id")
     private String id;
 
     /**
@@ -33,15 +33,13 @@ public class Layer {
     /**
      * 边的数量
      */
-    @Column
-    @ColumnDefault("INT default 0")
+    @Column(columnDefinition = "INTEGER default 0")
     private Integer lineNum = 0;
 
     /**
      * 节点个数
      */
-    @Column
-    @ColumnDefault("INT default 0")
+    @Column(columnDefinition = "INTEGER default 0")
     private Integer nodeNum = 0;
 
     public Layer() {
@@ -92,5 +90,16 @@ public class Layer {
 
     public void setNodeNum(Integer nodeNum) {
         this.nodeNum = nodeNum;
+    }
+
+    @Override
+    public String toString() {
+        return "Layer{" +
+                "id='" + id + '\'' +
+                ", network=" + network +
+                ", parentId='" + parentId + '\'' +
+                ", lineNum=" + lineNum +
+                ", nodeNum=" + nodeNum +
+                '}';
     }
 }
