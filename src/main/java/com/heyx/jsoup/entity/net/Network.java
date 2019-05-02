@@ -18,16 +18,17 @@ public class Network {
     private String id;
 
     /**
+     * 有可能出现异构网络，所以 多个网络对应一种信息。
+     */
+    @ManyToOne
+    @JoinColumn
+    private Info info;
+
+    /**
      * 迭代次数
      */
     @Column(columnDefinition = "INTEGER default 0")
     private Integer trainNum = 0;
-
-    /**
-     * 层个数
-     */
-    @Column(columnDefinition = "INTEGER default 0")
-    private Integer layerNum = 0;
 
     /**
      * 正确率
@@ -38,9 +39,9 @@ public class Network {
     public Network() {
     }
 
-    public Network(Integer trainNum, Integer layerNum, Double rightRate) {
+    public Network(Info info, Integer trainNum, Double rightRate) {
+        this.info = info;
         this.trainNum = trainNum;
-        this.layerNum = layerNum;
         this.rightRate = rightRate;
     }
 
@@ -60,12 +61,12 @@ public class Network {
         this.trainNum = trainNum;
     }
 
-    public Integer getLayerNum() {
-        return layerNum;
+    public void setInfo(Info info) {
+        this.info = info;
     }
 
-    public void setLayerNum(Integer layerNum) {
-        this.layerNum = layerNum;
+    public Info getInfo() {
+        return info;
     }
 
     public Double getRightRate() {
@@ -75,4 +76,5 @@ public class Network {
     public void setRightRate(Double rightRate) {
         this.rightRate = rightRate;
     }
+
 }

@@ -8,8 +8,10 @@ import com.heyx.jsoup.entity.net.Line;
 import com.heyx.jsoup.entity.net.Network;
 import com.heyx.jsoup.entity.net.Node;
 import com.heyx.jsoup.service.BaseService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +47,24 @@ public class NetworkService extends BaseService<Network, String> {
     }
 
     /**
-     * 检查两个网络是否相同
+     * 简单检查两个网络是否相同
      */
     public boolean checkNetwork(Network m, Network n){
         if ((null == m) || (null == n)){
             return false;
         }
-        if (!m.getLayerNum().equals(n.getLayerNum())){
+        return m.getInfo().equals(n.getInfo());
+    }
+
+    /**
+     * 检查两个网络是否相同
+     */
+    @Transactional
+    public boolean checkNetworkLayer(Network m, Network n){
+        if ((null == m) || (null == n)){
+            return false;
+        }
+        if (!m.getInfo().equals(n.getInfo())){
             return false;
         }
 
@@ -83,46 +96,39 @@ public class NetworkService extends BaseService<Network, String> {
      */
     public void generateNetWork(){
 
+//        Network network = new Network();
+//        network = networkRepo.save(network);
+
     }
 
     /**
-     * 生成输出层节点
-     * 输出层
+     * 生成一层的节点
+     * 输入层 nodeNum：NodeConst.MIN_NODE_NUM * historyNum;
+     * 输出层 nodeNum：NodeConst.MIN_NODE_NUM
      */
-    public List<Node> generateOutput(Network network){
+    @Transactional
+    public Layer generateLayer(Network network, String parentId , int nodeNum){
         if (network == null){
             return null;
         }
-        //TODO
-        int nodeNum = NodeConst.MIN_NODE_NUM;
-        List<Node> nodeList = new ArrayList<>();
-        for (int i = 0; i < nodeNum; i++) {
-            Node node = new Node();
-            nodeList.add(node);
-        }
-        return nodeService.saveAll(nodeList);
-    }
-
-    /**
-     * 生成输入层节点
-     * 根据 history值来算
-     */
-    public List<Node> generateInput(Network network, int historyNum){
-        if(network == null){
+        if (nodeNum < NodeConst.MIN_NODE_NUM || nodeNum > NodeConst.MAX_NODE_NUM){
             return null;
         }
-        int nodeNum = NodeConst.MIN_NODE_NUM * historyNum;
-        Layer layer = new Layer(network, LayerConst.INPUT_LAYER_ID, 0, nodeNum);
+        if (StringUtils.isBlank(parentId)){
+            return null;
+        }
+
+        Layer layer = new Layer(network, parentId, 0, nodeNum);
         layer = layerService.save(layer);
+
         List<Node> nodeList = new ArrayList<>();
         for (int i = 0; i < nodeNum; i++) {
             Node node = new Node(layer, i, NodeConst.INIT_BIAS);
             nodeList.add(node);
         }
-        int layerNum = network.getLayerNum() + 1;
-        network.setLayerNum(layerNum);
-        networkRepo.save(network);
-        return nodeService.saveAll(nodeList);
+        nodeService.saveAll(nodeList);
+
+        return layer;
     }
 
 }
