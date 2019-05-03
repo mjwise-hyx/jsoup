@@ -38,7 +38,7 @@ public class RandomTest {
 
     @Test
     public void getNodeNum(){
-        for (int nodeNum = NodeConst.MIN_NODE_NUM; nodeNum <= NodeConst.MAX_NODE_NUM; nodeNum+=56) {
+        for (int nodeNum = NodeConst.MIN_NODE_NUM; nodeNum <= NodeConst.MAX_NODE_NUM; nodeNum+=NodeConst.MIN_NODE_NUM) {
             System.out.println(nodeNum);
         }
     }

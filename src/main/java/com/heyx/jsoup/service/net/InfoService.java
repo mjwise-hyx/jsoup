@@ -4,6 +4,7 @@ import com.heyx.jsoup.constant.LayerConst;
 import com.heyx.jsoup.constant.NodeConst;
 import com.heyx.jsoup.dao.net.InfoRepo;
 import com.heyx.jsoup.entity.net.Info;
+import com.heyx.jsoup.entity.net.Node;
 import com.heyx.jsoup.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,15 @@ public class InfoService extends BaseService<Info, String> {
      */
     public void generateInfo(){
         for (int layerNum = LayerConst.MIN_LAYER_NUM; layerNum <= LayerConst.MAX_LAYER_NUM; layerNum++) {
-
+            String info = "";
             for (int l_index = 0; l_index < layerNum; l_index++) {
                 //输入层
-                //中间层
-                //输出层
-                for (int nodeNum = NodeConst.MIN_NODE_NUM; nodeNum < NodeConst.MAX_NODE_NUM; nodeNum+=56) {
-                    System.out.println(nodeNum);
+                for (int inputNum = NodeConst.MIN_NODE_NUM; inputNum < NodeConst.MAX_INPUT_NUM; inputNum+=NodeConst.MIN_NODE_NUM) {
+                    //中间层
+                    for (int nodeNum = NodeConst.MIN_NODE_NUM; nodeNum < NodeConst.MAX_NODE_NUM; nodeNum+=NodeConst.MIN_NODE_NUM) {
+                        System.out.println(nodeNum);
+                        //输出层
+                    }
                 }
             }
         }

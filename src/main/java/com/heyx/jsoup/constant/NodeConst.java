@@ -15,8 +15,12 @@ public class NodeConst {
     /**
      * 单层最大节点数
      */
-    public static final int MAX_NODE_NUM =56 * 100;
+    public static final int MAX_NODE_NUM = 56 * 100;
 
+    /**
+     * 输入层 最大输入 数据 个数
+     */
+    public static final int MAX_INPUT_NUM = 56 * 10;
 
 
 
