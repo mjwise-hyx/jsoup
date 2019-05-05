@@ -30,8 +30,8 @@ public class Node {
     /**
      * 偏置
      */
-    @Column(columnDefinition = "INTEGER default 0")
-    private Integer bias = 0;
+    @Column(columnDefinition = "INTEGER default 1")
+    private Integer bias = 1;
 
     public Node() {
     }

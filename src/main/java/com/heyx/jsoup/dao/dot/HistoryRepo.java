@@ -4,6 +4,8 @@ import com.heyx.jsoup.dao.BaseRepo;
 import com.heyx.jsoup.entity.dot.History;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @description:
  * @author: heyx
@@ -13,4 +15,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HistoryRepo extends BaseRepo<History,String> {
     boolean existsByCode(String code);
+
+    List<History> findAllByCodeBetween(String start, String end);
 }

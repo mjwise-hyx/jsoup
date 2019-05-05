@@ -61,11 +61,11 @@ public class Info {
         this.layerNum = layerNum;
     }
 
-    public String getInfo() {
+    public String getLayerInfo() {
         return layerInfo;
     }
 
-    public void setInfo(String layerInfo) {
+    public void setLayerInfo(String layerInfo) {
         this.layerInfo = layerInfo;
     }
 

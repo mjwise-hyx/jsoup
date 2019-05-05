@@ -39,6 +39,10 @@ public class Network {
     public Network() {
     }
 
+    public Network(Info info) {
+        this.info = info;
+    }
+
     public Network(Info info, Integer trainNum, Double rightRate) {
         this.info = info;
         this.trainNum = trainNum;

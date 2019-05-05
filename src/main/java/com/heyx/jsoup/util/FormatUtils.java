@@ -10,6 +10,21 @@ import java.math.BigInteger;
  */
 public class FormatUtils {
 
+    public static byte[] byteMergerAll(byte[]... values) {
+        int byte_length = 0;
+        for (int i = 0; i < values.length; i++) {
+            byte_length += values[i].length;
+        }
+        byte[] all_byte = new byte[byte_length];
+        int count = 0;
+        for (int i = 0; i < values.length; i++) {
+            byte[] b = values[i];
+            System.arraycopy(b, 0, all_byte, count, b.length);
+            count += b.length;
+        }
+        return all_byte;
+    }
+
     public static byte convertToByte(int num) {
         return (byte) (num & 0xff);
     }
@@ -37,34 +52,16 @@ public class FormatUtils {
     public static String printBytes(byte[][] bytes) {
         StringBuilder result = new StringBuilder();
         for (byte[] b : bytes) {
-            result.append(bytesTobit(b, false));
+            result.append(bytesTobit(b));
             result.append("\n");
         }
         return result.toString();
     }
 
-    public static String printBytes(byte[][] bytes, int radix) {
-        StringBuilder result = new StringBuilder();
-        for (byte[] aByte : bytes) {
-            result.append(binary(aByte, radix));
-            result.append("\n");
-        }
-        return result.toString();
-    }
-
-    private static String binary(byte[] bytes, int radix) {
-        return new BigInteger(1, bytes).toString(radix);// 这里的1代表正数
-    }
-
-
-    public static String bytesTobit(byte bytes[], boolean isBr) {
+    public static String bytesTobit(byte[] bytes) {
         StringBuilder result = new StringBuilder();
         for (byte b : bytes) {
             result.append(byteToBit(b));
-            result.append(" ");
-            if (isBr) {
-                result.append("\n");
-            }
         }
         return result.toString();
     }
@@ -78,6 +75,10 @@ public class FormatUtils {
                 + (byte) ((b >> 5) & 0x1) + (byte) ((b >> 4) & 0x1)
                 + (byte) ((b >> 3) & 0x1) + (byte) ((b >> 2) & 0x1)
                 + (byte) ((b >> 1) & 0x1) + (byte) ((b) & 0x1);
+    }
+
+    public static int getIndexValue(String src, int index) {
+        return Integer.parseInt(src.substring(index, index + 1));
     }
 
 

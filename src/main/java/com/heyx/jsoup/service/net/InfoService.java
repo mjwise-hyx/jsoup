@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class InfoService extends BaseService<Info, String> {
 
@@ -27,11 +29,26 @@ public class InfoService extends BaseService<Info, String> {
         if (null == layerNum){
             return false;
         }
-        String layerInfo = info.getInfo();
+        String layerInfo = info.getLayerInfo();
         if (StringUtils.isBlank(layerInfo)){
             return false;
         }
         return CountStringUtils.count(layerInfo, '-') == layerNum - 1;
+    }
+
+    /**
+     * 获取所有节点数
+     */
+    public int getNodeNum(Info info){
+        int nodeNum = 0;
+        if (null == info){
+            return nodeNum;
+        }
+        List<String> layers = CountStringUtils.splitString(info.getLayerInfo(),"-");
+        for (String layer : layers) {
+            nodeNum += Integer.parseInt(layer.split(":")[1].split("@")[0]);
+        }
+        return nodeNum;
     }
 
     /**

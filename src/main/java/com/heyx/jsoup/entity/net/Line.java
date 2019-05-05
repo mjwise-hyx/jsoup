@@ -31,8 +31,8 @@ public class Line {
     /**
      * 偏置放大 1000 倍
      */
-    @Column(columnDefinition = "INTEGER default 0")
-    private Integer weight;
+    @Column(columnDefinition = "INTEGER default 1000")
+    private Integer weight = 1000;
 
     public Line() {
     }
