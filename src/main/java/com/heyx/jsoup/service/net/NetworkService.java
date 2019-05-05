@@ -94,7 +94,7 @@ public class NetworkService extends BaseService<Network, String> {
     /**
      * 生成一个神经网络
      */
-    public void generateNetWork(){
+    public void generateNetWork(String info){
 
 //        Network network = new Network();
 //        network = networkRepo.save(network);
