@@ -41,6 +41,14 @@ public class NetworkService extends BaseService<Network, String> {
 
     /**
      * 训练
+     * 思路：
+     * 1. 用结果的差值去拟合，
+     * 保持其他的节点不变，直到调节到最小的位置，然后调节其他的，直到达到一定的条件
+     * if(diff - lastDiff 变大直到 满足一定的条件){
+     *     w 向上一次相反的方向移动。
+     * }else{
+     *     w 向上一次相同的方向移动。
+     * }
      */
     public void train(){
         //TODO
