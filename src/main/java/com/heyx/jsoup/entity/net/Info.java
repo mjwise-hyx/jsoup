@@ -23,13 +23,13 @@ public class Info {
 
     /**
      * 层信息 边数和节点数
-     * 1.边和点之间用:
+     * 1.边和点之间用:   边数：点数
      * 2.层之间用 "-" 分隔
      * 3.如出现多种情况的时候 用@i 表示第i种情况 如：@1
-     * 如： 1:3-2:5@1
+     * 如： 1:3@1-2:5@1
      */
     @Column
-    private String info;
+    private String layerInfo;
 
     /**
      * 是否生成过网络
@@ -40,9 +40,9 @@ public class Info {
     public Info() {
     }
 
-    public Info(Integer layerNum, String info) {
+    public Info(Integer layerNum, String layerInfo) {
         this.layerNum = layerNum;
-        this.info = info;
+        this.layerInfo = layerInfo;
     }
 
     public String getId() {
@@ -61,12 +61,12 @@ public class Info {
         this.layerNum = layerNum;
     }
 
-    public String getInfo() {
-        return info;
+    public String getLayerInfo() {
+        return layerInfo;
     }
 
-    public void setInfo(String info) {
-        this.info = info;
+    public void setLayerInfo(String layerInfo) {
+        this.layerInfo = layerInfo;
     }
 
     public Boolean getUsed() {
@@ -78,16 +78,26 @@ public class Info {
     }
 
     @Override
+    public String toString() {
+        return "Info{" +
+                "id='" + id + '\'' +
+                ", layerNum=" + layerNum +
+                ", layerInfo='" + layerInfo + '\'' +
+                ", isUsed=" + isUsed +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Info info1 = (Info) o;
         return Objects.equals(layerNum, info1.layerNum) &&
-                Objects.equals(info, info1.info);
+                Objects.equals(layerInfo, info1.layerInfo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(layerNum, info);
+        return Objects.hash(layerNum, layerInfo);
     }
 }

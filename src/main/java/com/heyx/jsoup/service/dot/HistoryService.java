@@ -7,6 +7,9 @@ import com.heyx.jsoup.util.FormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @description:
  * @author: heyx
@@ -22,6 +25,9 @@ public class HistoryService extends BaseService<History, String> {
         return historyRepo.existsByCode(code);
     }
 
+    public List<History> findAllByCodeBetween(String start, String end){
+        return historyRepo.findAllByCodeBetween(start, end);
+    }
 
     public byte[][] convertToMatrix(History history) {
         byte[][] result = new byte[7][4];
@@ -33,6 +39,21 @@ public class HistoryService extends BaseService<History, String> {
         result[5] = FormatUtils.intToByte(Integer.parseInt(history.getNum6()));
         result[6] = FormatUtils.intToByte(Integer.parseInt(history.getBule()));
         return result;
+    }
+
+    public String convertToSampleMatrixWithStep(List<History> histories, int step) {
+        String output = "";
+        if (null == histories) {
+            return output;
+        }
+        int size = histories.size();
+        byte[] result = new byte[7 * step];
+        for (int i = 0; i < size; i += step) {
+            for (int j = 0; j < step; j++) {
+                result = FormatUtils.byteMergerAll(result, convertToSampleMatrix(histories.get(i + j)));
+            }
+        }
+        return FormatUtils.bytesTobit(result);
     }
 
     public byte[] convertToSampleMatrix(History history) {
@@ -55,10 +76,10 @@ public class HistoryService extends BaseService<History, String> {
         String num5 = String.valueOf(FormatUtils.byteToInt(bytes[4]));
         String num6 = String.valueOf(FormatUtils.byteToInt(bytes[5]));
         String blue = String.valueOf(FormatUtils.byteToInt(bytes[6]));
-        return new History(code,num1,num2,num3,num4,num5,num6,blue);
+        return new History(code, num1, num2, num3, num4, num5, num6, blue);
     }
 
-    public History convertToHistory(byte[][] bytes, String code){
+    public History convertToHistory(byte[][] bytes, String code) {
         String num1 = String.valueOf(FormatUtils.bytesToInt(bytes[0]));
         String num2 = String.valueOf(FormatUtils.bytesToInt(bytes[1]));
         String num3 = String.valueOf(FormatUtils.bytesToInt(bytes[2]));
@@ -66,6 +87,6 @@ public class HistoryService extends BaseService<History, String> {
         String num5 = String.valueOf(FormatUtils.bytesToInt(bytes[4]));
         String num6 = String.valueOf(FormatUtils.bytesToInt(bytes[5]));
         String blue = String.valueOf(FormatUtils.bytesToInt(bytes[6]));
-        return new History(code,num1,num2,num3,num4,num5,num6,blue);
+        return new History(code, num1, num2, num3, num4, num5, num6, blue);
     }
 }

@@ -110,4 +110,12 @@ public class JsoupApplicationTests {
         }
     }
 
+    @Test
+    public void testBetween(){
+        List<History> historyList = historyService.findAllByCodeBetween("03076", "03081");
+        for (History history : historyList) {
+            System.out.println(history);
+        }
+    }
+
 }

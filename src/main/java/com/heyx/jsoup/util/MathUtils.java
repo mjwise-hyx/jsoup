@@ -2,6 +2,16 @@ package com.heyx.jsoup.util;
 
 public class MathUtils {
 
+    public static String getCode(String code, int step){
+        int codeLength = code.length();
+        StringBuilder result = new StringBuilder(Integer.toString(Integer.valueOf(code) + step - 1));
+
+        while (result.length() < codeLength){
+            result.insert(0, "0");
+        }
+        return result.toString();
+    }
+
     // 求排列数 A(n,m) n>m
     public static int A(int n, int m)
     {

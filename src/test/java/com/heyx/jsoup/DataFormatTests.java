@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -36,7 +37,7 @@ public class DataFormatTests {
 
 
             byte[] simple = historyService.convertToSampleMatrix(historyOptional.get());
-            String simple_format = FormatUtils.bytesTobit(simple,false).replace(" ","");
+            String simple_format = FormatUtils.bytesTobit(simple);
             System.out.println(simple_format.length());
             System.out.println(simple_format);
 

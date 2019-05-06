@@ -17,5 +17,11 @@ public class MathTest {
         System.out.println("C(6,5)=" + MathUtils.C(6, 5));// 6
     }
 
+    @Test
+    public void getCode(){
+        String code = "03081";
+        String result = MathUtils.getCode(code, 3);
+        System.out.println(result);
+    }
 
 }
