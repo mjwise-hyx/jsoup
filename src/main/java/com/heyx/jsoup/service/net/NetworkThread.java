@@ -2,10 +2,12 @@ package com.heyx.jsoup.service.net;
 
 import com.heyx.jsoup.entity.net.Network;
 
+import java.util.concurrent.Callable;
+
 /**
  * 用于训练的线程类
  */
-public class NetworkThread extends Thread {
+public class NetworkThread implements Callable<String> {
 
     private String startCode;
 
@@ -20,8 +22,7 @@ public class NetworkThread extends Thread {
     }
 
     @Override
-    public void run() {
-        String result = networkService.calc(network, startCode);
-        System.out.println(result);
+    public String call() throws Exception {
+        return networkService.calc(network, startCode);
     }
 }

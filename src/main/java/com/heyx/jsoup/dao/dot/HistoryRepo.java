@@ -14,7 +14,8 @@ import java.util.List;
  */
 @Repository
 public interface HistoryRepo extends BaseRepo<History,String> {
-    boolean existsByCode(String code);
 
+    boolean existsByCode(String code);
+    List<History> findByCode(String code);
     List<History> findAllByCodeBetween(String start, String end);
 }

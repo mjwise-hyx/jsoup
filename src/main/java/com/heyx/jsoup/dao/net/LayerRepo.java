@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface LayerRepo extends BaseRepo<Layer, String> {
     List<Layer> findAllByNetwork(Network network);
+
+    Layer findFirstByNetworkAndParentId(Network network, String inputLayerId);
 }

@@ -30,5 +30,5 @@ public class NodeConst {
     /**
      * 输出阈值
      */
-    public static final Double LINE_OUTPUT_THRESHOLD = 500.0;
+    public static final Double LINE_OUTPUT_THRESHOLD = 0.5;
 }

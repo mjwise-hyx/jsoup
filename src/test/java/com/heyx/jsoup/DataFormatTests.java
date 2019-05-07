@@ -28,22 +28,32 @@ public class DataFormatTests {
 
     @Test
     public void convertHistory() {
-        Optional<History> historyOptional = historyService.findById("40289fd36a0d3983016a0d3991040000");
-        if (historyOptional.isPresent()){
-            byte[][] his = historyService.convertToMatrix( historyOptional.get());
+        List<History> histories = historyService.findAllByCodeBetween("18100","18108");
+        for (History history : histories) {
+            byte[][] his = historyService.convertToMatrix(history);
             System.out.println(FormatUtils.printBytes(his));
             History history1 = historyService.convertToHistory(his, "12221");
             System.out.println(history1.toString());
 
 
-            byte[] simple = historyService.convertToSampleMatrix(historyOptional.get());
+            byte[] simple = historyService.convertToSampleMatrix(history);
             String simple_format = FormatUtils.bytesTobit(simple);
             System.out.println(simple_format.length());
             System.out.println(simple_format);
 
-            History history = historyService.convertToHistory(simple, "1111");
-            System.out.println(history.toString());
+            History history2 = historyService.convertToHistory(simple, "1111");
+            System.out.println(history2.toString());
         }
+
+    }
+
+
+    @Test
+    public void testCompare(){
+        String result = "00000000000000000000000000000000000000000000000000000000";
+        String good = "00011001000001100000001100000010000111010001001100000001";
+        int rate = historyService.compareResult(result, good);
+        System.out.println(rate);
     }
 
 }

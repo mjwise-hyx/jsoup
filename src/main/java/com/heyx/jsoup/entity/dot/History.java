@@ -47,7 +47,6 @@ public class History {
     @Column
     private String num6;
 
-
     @Column
     private String bule;
 

@@ -1,5 +1,6 @@
 package com.heyx.jsoup.service.dot;
 
+import com.heyx.jsoup.constant.NodeConst;
 import com.heyx.jsoup.dao.dot.HistoryRepo;
 import com.heyx.jsoup.entity.dot.History;
 import com.heyx.jsoup.service.BaseService;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @description:
@@ -88,5 +90,27 @@ public class HistoryService extends BaseService<History, String> {
         String num6 = String.valueOf(FormatUtils.bytesToInt(bytes[5]));
         String blue = String.valueOf(FormatUtils.bytesToInt(bytes[6]));
         return new History(code, num1, num2, num3, num4, num5, num6, blue);
+    }
+
+    public int compareResult(String result, String good){
+        char[] resultChar = result.toCharArray();
+        char[] goodChar = good.toCharArray();
+        if (NodeConst.MIN_NODE_NUM != resultChar.length){
+            return 0;
+        }
+        if (NodeConst.MIN_NODE_NUM != goodChar.length){
+            return 0;
+        }
+        int rate = 0;
+        for (int i = 0; i < NodeConst.MIN_NODE_NUM; i++) {
+            if (resultChar[i] == goodChar[i]){
+                rate ++;
+            }
+        }
+        return rate;
+    }
+
+    public List<History> findByCode(String code) {
+        return historyRepo.findByCode(code);
     }
 }
