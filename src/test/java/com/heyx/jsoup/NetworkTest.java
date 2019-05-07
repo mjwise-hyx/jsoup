@@ -1,6 +1,5 @@
 package com.heyx.jsoup;
 
-import com.heyx.jsoup.constant.LayerConst;
 import com.heyx.jsoup.entity.net.Info;
 import com.heyx.jsoup.entity.net.Layer;
 import com.heyx.jsoup.entity.net.Network;
@@ -10,10 +9,8 @@ import com.heyx.jsoup.service.net.LayerService;
 import com.heyx.jsoup.service.net.NetworkService;
 import com.heyx.jsoup.service.net.NodeService;
 import com.heyx.jsoup.util.CountStringUtils;
-import com.heyx.jsoup.util.FormatUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nd4j.linalg.api.ops.Op;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -108,6 +105,4 @@ public class NetworkTest {
             System.out.println(result);
         }
     }
-
-
 }
