@@ -25,10 +25,16 @@ public class NodeConst {
     /**
      * 放大倍数
      */
-    public static final Double LINE_FACTOR_NUM = 1000.0;
+    public static final int LINE_FACTOR_NUM = 1000;
+
+    /**
+     * 最大偏置
+     */
+    public static final int MAX = 1000;
 
     /**
      * 输出阈值
      */
     public static final Double LINE_OUTPUT_THRESHOLD = 0.5;
+    public static final int ERROR_NODE_RATE = 5;
 }

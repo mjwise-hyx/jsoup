@@ -51,7 +51,8 @@ public class DataFormatTests {
     @Test
     public void testCompare(){
         String result = "00000000000000000000000000000000000000000000000000000000";
-        String good = "00011001000001100000001100000010000111010001001100000001";
+        String good = "00000000000000000000000000000000000000000000000000000000";
+//        String good = "00011001000001100000001100000010000111010001001100000001";
         int rate = historyService.compareResult(result, good);
         System.out.println(rate);
     }
