@@ -63,9 +63,19 @@ public class NetworkService extends BaseService<Network, String> {
      * }else{
      *     w 向上一次相同的方向移动。
      * }
+     *
+     * 2.过程，计算，之后调节参数，再计算，直到 符合结果
      */
     public void train() {
         //TODO
+    }
+
+    /**
+     * 动态调节
+     * @return
+     */
+    public Integer dynamicTuning(){
+        return 1;
     }
 
     /**
@@ -96,9 +106,10 @@ public class NetworkService extends BaseService<Network, String> {
                     List<Line> lines = lineService.findAllByOutput(node);
                     double value = 0.0;
                     for (Line line : lines) {
-                        value += lastLayerVlaue.get(line.getInput().getSize()) *
+                        double y = lastLayerVlaue.get(line.getInput().getSize()) *
                                 line.getWeight() / NodeConst.LINE_FACTOR_NUM +
                                 node.getBias();
+                        value += MathUtils.sigmoid(y) ;
                     }
                     valueMap.put(node.getSize(), value);
                 }
