@@ -98,7 +98,8 @@ public class NetworkService extends BaseService<Network, String> {
             List<Node> nodeList = nodeService.findAllByLayer(layer);
             if (LayerConst.INPUT_LAYER_ID.equals(layer.getParentId())) {
                 for (int i = 0; i < inputNum; i++) {
-                    double value = FormatUtils.getIndexValue(input, i) + nodeList.get(i).getBias();
+                    double y = FormatUtils.getIndexValue(input, i) + nodeList.get(i).getBias();
+                    double value = MathUtils.sigmoid(y);
                     valueMap.put(nodeList.get(i).getSize(), value);
                 }
             } else {

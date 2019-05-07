@@ -5,18 +5,17 @@ import com.heyx.jsoup.entity.net.Info;
 import com.heyx.jsoup.entity.net.Layer;
 import com.heyx.jsoup.entity.net.Network;
 import com.heyx.jsoup.entity.net.Node;
-import com.heyx.jsoup.service.net.InfoService;
-import com.heyx.jsoup.service.net.LayerService;
-import com.heyx.jsoup.service.net.NetworkService;
-import com.heyx.jsoup.service.net.NodeService;
+import com.heyx.jsoup.service.net.*;
 import com.heyx.jsoup.util.CountStringUtils;
 import com.heyx.jsoup.util.FormatUtils;
+import kotlin.jvm.Synchronized;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nd4j.linalg.api.ops.Op;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +36,7 @@ public class NetworkTest {
     LayerService layerService;
 
     /**
-     *先生成一个网络 用于跑通整个工程
+     * 先生成一个网络 用于跑通整个工程
      * 全连通网络
      * 5*56
      * 10*56
@@ -48,34 +47,34 @@ public class NetworkTest {
      * 1*56
      */
     @Test
-    public void generateInfo(){
+    public void generateInfo() {
         String layerInfo =
-            //输入层
-            "0:280@1" +
-            //第一层
-            "-156880:560@1" +
-            //第二层
-            "-250880:448@1" +
-            //第三层
-            "-150528:336@1" +
-            //第四层
-            "-75264:224@1" +
-            //第五层
-            "-25088:112@1" +
-            //输出层
-            "-6272:56@1";
+                //输入层
+                "0:280@1" +
+                        //第一层
+                        "-156880:560@1" +
+                        //第二层
+                        "-250880:448@1" +
+                        //第三层
+                        "-150528:336@1" +
+                        //第四层
+                        "-75264:224@1" +
+                        //第五层
+                        "-25088:112@1" +
+                        //输出层
+                        "-6272:56@1";
         Info info = new Info(7, layerInfo);
-        System.out.println(info.toString());
         info = infoService.save(info);
+        System.out.println(info.toString());
         System.out.println(infoService.isValid(info));
     }
 
     @Test
-    public void testParseInfo(){
+    public void testParseInfo() {
         List<Info> infos = infoService.findAll();
         String layerInfo = infos.get(0).getLayerInfo();
 
-        List<String> layers = CountStringUtils.splitString(layerInfo,"-");
+        List<String> layers = CountStringUtils.splitString(layerInfo, "-");
         for (String layer : layers) {
             System.out.println(layer);
             System.out.println("the node Num is " + layer.split(":")[1].split("@")[0]);
@@ -83,15 +82,15 @@ public class NetworkTest {
     }
 
     @Test
-    public void generateNetwork(){
+    public void generateNetwork() {
         List<Info> infos = infoService.findAll();
         networkService.generateNetWork(infos.get(0));
     }
 
     @Test
-    public void findNode(){
+    public void findNode() {
         Optional<Layer> layerOptional = layerService.findById("40283a816a87e7cd016a87e7e5ac011a");
-        if (layerOptional.isPresent()){
+        if (layerOptional.isPresent()) {
             List<Node> nodes = nodeService.findAllByLayer(layerOptional.get());
             for (Node node : nodes) {
                 System.out.println(node.getSize());
@@ -101,11 +100,21 @@ public class NetworkTest {
     }
 
     @Test
-    public void calcTest(){
-        Optional<Network> networkOptional = networkService.findById("40283a816a87e7cd016a87e7e57d0000");
-        if (networkOptional.isPresent()){
-            String result = networkService.calc(networkOptional.get(), "09137");
+    public void calcTest() {
+        Optional<Network> networkOptional = networkService.findById("402881e56a8fe65e016a8fe672a50000");
+        if (networkOptional.isPresent()) {
+            String result = networkService.calc(networkOptional.get(), "18100");
             System.out.println(result);
+        }
+    }
+
+    @Test
+    @Synchronized
+    public void calcThreadTest() {
+        Optional<Network> networkOptional = networkService.findById("402881e56a8fe65e016a8fe672a50000");
+        if (networkOptional.isPresent()) {
+            NetworkThread networkThread = new NetworkThread(networkOptional.get(), networkService, "18100");
+            networkThread.start();
         }
     }
 
