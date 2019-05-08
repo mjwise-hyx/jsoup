@@ -111,7 +111,7 @@ public class NetworkTest {
 //    public void calcThreadTest() {
 //        Optional<Network> networkOptional = networkService.findById("402881e56a8fe65e016a8fe672a50000");
 //        if (networkOptional.isPresent()) {
-//            NetworkThread networkThread = new NetworkThread(networkOptional.get(), networkService, "18100");
+//            NetworkCall networkThread = new NetworkCall(networkOptional.get(), networkService, "18100");
 //            networkThread.start();
 //        }
 //    }

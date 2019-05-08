@@ -2,6 +2,7 @@ package com.heyx.jsoup.service.net;
 
 import com.heyx.jsoup.constant.LayerConst;
 import com.heyx.jsoup.constant.NodeConst;
+import com.heyx.jsoup.constant.TrainConst;
 import com.heyx.jsoup.dao.net.NetworkRepo;
 import com.heyx.jsoup.entity.dot.History;
 import com.heyx.jsoup.entity.net.*;
@@ -66,62 +67,122 @@ public class NetworkService extends BaseService<Network, String> {
      * <p>
      * 3.一半一半去调节，从大到小
      */
-    public void train(Network network) {
-
+    public void train(Network network, String startCode, String good) {
         int adjust = 1;
         HashMap<String, Integer> maxArgs = null;
         HashMap<String, Integer> minArgs = null;
         int lastRate = 0;
-        int stepSize = layerService.getStepSize(network);
+        int count = 0; //用于记录连续的几次值
+        int num = 0;
+        while ((lastRate < NodeConst.MIN_NODE_NUM - NodeConst.ERROR_NODE_RATE) ||
+                (num < TrainConst.MAX_TRAIN_NUM) ) {
 
-        String startCode = "03001";
-        String nextCode = MathUtils.getCode(startCode, stepSize + 1);
-        String good = "";
-        List<History> histories = historyService.findByCode(nextCode);
-        if (histories.size() == 1) {
-            good = FormatUtils.bytesTobit(historyService.convertToSampleMatrix(histories.get(0)));
-        }
-        while (lastRate < NodeConst.MIN_NODE_NUM - NodeConst.ERROR_NODE_RATE) {
+            num ++;
+            System.out.println("-正在计算第 " + startCode +" 期,第 "+ num +" 次的数据");
 
             //1. 生成 一组用来计算的调节参数  a-正向调节 b-反向调节
-            HashMap<String, Integer> args = dynamicTuning(maxArgs, minArgs, adjust);
+            HashMap<String, Integer> args = dynamicTuning(network, maxArgs, minArgs, adjust);
             //2.计算结果
             String result = calc(network, startCode, args);
             int rate = historyService.compareResult(result, good);
-
-            if (rate >= lastRate) {
-                //说明调节有效果，进行调节
+            if (rate < lastRate) {
+                count++;
+                if (count == TrainConst.MAX_COUNT_NUM){
+                    count = 0;
+                    //多次没有效果进行转换调节方向
+                    if (adjust == 1){
+                        adjust = -1;
+                    }else {
+                        adjust = 1;
+                    }
+                }
+                //反向调节参数
+                minArgs = args;
+            } else {
+                //说明调节有效果，进行保存
                 saveResult(network, args);
-                lastRate = rate;
                 adjust = 1;
                 maxArgs = args;
-            } else {
-                //没有效果不进行调节，
-                adjust = -1;
-                minArgs = args;
-                //多次没有效果进行反向调节
             }
+            lastRate = rate;
 
         }
-//        startCode = nextCode;
+        System.out.println( "============第 "+startCode+" 期数据，训练结束了！ =============");
     }
 
     /**
      * 动态调节
      *
-     * @retur
-     * @param maxArgs
-     * @param minArgs
-     * @param adjust
+     * @return 返回每个节点的调节结果
+     * @param network 网络
+     * @param maxArgs 上一次优的结果
+     * @param minArgs 上一次不好的结果
+     * @param adjust 调节方向
      */
     public HashMap<String, Integer> dynamicTuning(
-            HashMap<String, Integer> maxArgs, HashMap<String, Integer> minArgs, int adjust) {
-        if (adjust == 1){
-
-        }else if(adjust == -1) {
-
+            Network network, HashMap<String, Integer> maxArgs, HashMap<String, Integer> minArgs, int adjust) {
+        if (network == null){
+            return new HashMap<>();
         }
-        return null;
+        HashMap<String, Integer> args = new HashMap<>();
+        List<Layer> layers = layerService.findAllByNetwork(network);
+        List<Layer> layerList = layerService.sortByParentId(layers);
+        for (Layer layer : layerList) {
+            List<Node> nodeList = nodeService.findAllByLayer(layer);
+            for (Node node : nodeList) {
+                int NODE_START = -NodeConst.MAX;
+                int NODE_END = NodeConst.MAX;
+                if (adjust == 1){
+                    if (maxArgs != null){
+                        int value = maxArgs.get(node.getId());
+                        if( value >= 0){
+                            NODE_START = value;
+                        }else {
+                            NODE_END = value;
+                        }
+                    }
+                }else if(adjust == -1) {
+                    if (maxArgs != null){
+                        int value = maxArgs.get(node.getId());
+                        if( value >= 0){
+                            NODE_END = value;
+                        }else {
+                            NODE_START = value;
+                        }
+                    }
+                }
+                Integer bias = node.getBias() +  new Random().nextInt(NODE_END - NODE_START + 1) + NODE_START;
+                args.put(node.getId(), bias);
+                List<Line> lines = lineService.findAllByOutput(node);
+                for (Line line : lines) {
+                    int LINE_START = -NodeConst.MAX;
+                    int LINE_END = NodeConst.MAX;
+                    if (adjust == 1){
+                        if (maxArgs != null){
+                            int value = maxArgs.get(node.getId());
+                            if( value >= 0){
+                                LINE_START = value;
+                            }else {
+                                LINE_END = value;
+                            }
+                        }
+                    }else if(adjust == -1) {
+                        if (maxArgs != null){
+                            int value = maxArgs.get(node.getId());
+                            if( value >= 0){
+                                LINE_END = value;
+                            }else {
+                                LINE_START = value;
+                            }
+                        }
+                    }
+                    Integer weight = line.getWeight() +  new Random().nextInt(LINE_END - LINE_START + 1) + LINE_START;
+                    args.put(line.getId(), weight);
+                }
+            }
+        }
+
+        return args;
     }
 
     public void saveResult(Network network, HashMap<String, Integer> result) {
@@ -195,7 +256,15 @@ public class NetworkService extends BaseService<Network, String> {
                 for (Node node : nodeList) {
                     List<Line> lines = lineService.findAllByOutput(node);
                     double value = 0.0;
+                    Integer nodeValue = args.get(node.getId());
+                    if (nodeValue != null){
+                        node.setBias(node.getBias() + nodeValue);
+                    }
                     for (Line line : lines) {
+                        Integer lineValue = args.get(line.getId());
+                        if (lineValue != null) {
+                            line.setWeight(line.getWeight() + lineValue);
+                        }
                         value += lastLayerVlaue.get(line.getInput().getSize()) *
                                 line.getWeight() / NodeConst.LINE_FACTOR_NUM +
                                 node.getBias();
