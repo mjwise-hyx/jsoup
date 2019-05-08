@@ -13,13 +13,11 @@ import com.heyx.jsoup.util.MathUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import play.mvc.WebSocket;
+import scala.Int;
+import sun.nio.ch.Net;;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -55,24 +53,133 @@ public class NetworkService extends BaseService<Network, String> {
 
     /**
      * 训练
+     * 思路：
+     * 1. 用结果的差值去拟合，
+     * 保持其他的节点不变，直到调节到最小的位置，然后调节其他的，直到达到一定的条件
+     * if(diff - lastDiff 变大直到 满足一定的条件){
+     * w 向上一次相反的方向移动。
+     * }else{
+     * w 向上一次相同的方向移动。
+     * }
+     * <p>
+     * 2.过程，计算，之后调节参数，再计算，直到 符合结果
+     * <p>
+     * 3.一半一半去调节，从大到小
      */
-    public void train() {
-        //TODO
+    public void train(Network network) {
+
+        int adjust = 1;
+        HashMap<String, Integer> maxArgs = null;
+        HashMap<String, Integer> minArgs = null;
+        int lastRate = 0;
+        int stepSize = layerService.getStepSize(network);
+
+        String startCode = "03001";
+        String nextCode = MathUtils.getCode(startCode, stepSize + 1);
+        String good = "";
+        List<History> histories = historyService.findByCode(nextCode);
+        if (histories.size() == 1) {
+            good = FormatUtils.bytesTobit(historyService.convertToSampleMatrix(histories.get(0)));
+        }
+        while (lastRate < NodeConst.MIN_NODE_NUM - NodeConst.ERROR_NODE_RATE) {
+
+            //1. 生成 一组用来计算的调节参数  a-正向调节 b-反向调节
+            HashMap<String, Integer> args = dynamicTuning(maxArgs, minArgs, adjust);
+            //2.计算结果
+            String result = calc(network, startCode, args);
+            int rate = historyService.compareResult(result, good);
+
+            if (rate >= lastRate) {
+                //说明调节有效果，进行调节
+                saveResult(network, args);
+                lastRate = rate;
+                adjust = 1;
+                maxArgs = args;
+            } else {
+                //没有效果不进行调节，
+                adjust = -1;
+                minArgs = args;
+                //多次没有效果进行反向调节
+            }
+
+        }
+//        startCode = nextCode;
+    }
+
+    /**
+     * 动态调节
+     *
+     * @retur
+     * @param maxArgs
+     * @param minArgs
+     * @param adjust
+     */
+    public HashMap<String, Integer> dynamicTuning(
+            HashMap<String, Integer> maxArgs, HashMap<String, Integer> minArgs, int adjust) {
+        if (adjust == 1){
+
+        }else if(adjust == -1) {
+
+        }
+        return null;
+    }
+
+    public void saveResult(Network network, HashMap<String, Integer> result) {
+        List<Layer> layers = layerService.findAllByNetwork(network);
+        List<Layer> layerList = layerService.sortByParentId(layers);
+        for (Layer layer : layerList) {
+            List<Node> nodeList = nodeService.findAllByLayer(layer);
+            List<Node> changeNodeList = new ArrayList<>();
+            int nodeNum = 0;
+            for (Node node : nodeList) {
+                List<Line> lines = lineService.findAllByOutput(node);
+                List<Line> changeLineList = new ArrayList<>();
+                int lineNum = 0;
+                for (Line line : lines) {
+                    Integer weight = result.get(line.getId());
+                    if (null == weight) {
+                        line.setWeight(weight);
+                        changeLineList.add(line);
+                    }
+                    lineNum++;
+                    if (lineNum == 100) {
+                        lineService.saveAll(changeLineList);
+                        changeLineList.clear();
+                        lineNum = 0;
+                    }
+                }
+                lineService.saveAll(changeLineList);
+                Integer bias = result.get(node.getId());
+                if (null == bias) {
+                    node.setBias(bias);
+                    changeNodeList.add(node);
+                }
+                nodeNum++;
+                if (nodeNum == 100) {
+                    nodeService.saveAll(changeNodeList);
+                    changeNodeList.clear();
+                    nodeNum = 0;
+                }
+
+            }
+            nodeService.saveAll(changeNodeList);
+        }
     }
 
     /**
      * 计算一次
      */
-    public String calc(Network network, String startCode) {
+    public String calc(Network network, String startCode,HashMap<String, Integer> args) {
         if (null == network) {
-            return null;
+            return "";
         }
         List<Layer> layers = layerService.findAllByNetwork(network);
         List<Layer> layerList = layerService.sortByParentId(layers);
         int inputNum = layerList.get(0).getNodeNum();
         int stepSize = inputNum / NodeConst.MIN_NODE_NUM;
         //获得输入层的值
-        List<History> histories = historyService.findAllByCodeBetween(startCode, MathUtils.getCode(startCode, stepSize));
+        String endCode = MathUtils.getCode(startCode, stepSize);
+        List<History> histories = historyService.findAllByCodeBetween(startCode, endCode);
         String input = historyService.convertToSampleMatrixWithStep(histories, stepSize);
         Map<Integer, Double> lastLayerVlaue = new HashMap<>();
         for (Layer layer : layerList) {
@@ -80,7 +187,8 @@ public class NetworkService extends BaseService<Network, String> {
             List<Node> nodeList = nodeService.findAllByLayer(layer);
             if (LayerConst.INPUT_LAYER_ID.equals(layer.getParentId())) {
                 for (int i = 0; i < inputNum; i++) {
-                    double value = FormatUtils.getIndexValue(input, i) + nodeList.get(i).getBias();
+                    double y = FormatUtils.getIndexValue(input, i) + nodeList.get(i).getBias();
+                    double value = MathUtils.sigmoid(y);
                     valueMap.put(nodeList.get(i).getSize(), value);
                 }
             } else {
@@ -92,7 +200,8 @@ public class NetworkService extends BaseService<Network, String> {
                                 line.getWeight() / NodeConst.LINE_FACTOR_NUM +
                                 node.getBias();
                     }
-                    valueMap.put(node.getSize(), value);
+
+                    valueMap.put(node.getSize(), MathUtils.sigmoid(value));
                 }
             }
             lastLayerVlaue = valueMap;

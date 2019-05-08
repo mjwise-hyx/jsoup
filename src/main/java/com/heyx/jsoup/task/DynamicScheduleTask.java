@@ -2,6 +2,7 @@ package com.heyx.jsoup.task;
 
 import com.heyx.jsoup.entity.dot.Socks;
 import com.heyx.jsoup.service.dot.SocksSerivce;
+import com.heyx.jsoup.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -11,7 +12,9 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  *Cron表达式参数分别表示：
@@ -39,7 +42,8 @@ public class DynamicScheduleTask implements SchedulingConfigurer {
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         taskRegistrar.addTriggerTask(
                 () -> {
-                    System.out.println("执行动态定时任务: " + LocalDateTime.now().toLocalTime());
+                    String date = DateUtils.convertString(new Date());
+                    System.out.println("执行动态定时任务: " + date);
                 },
                 triggerContext -> {
                     Socks socks = socksSerivce.findFirstByName("定时任务一");

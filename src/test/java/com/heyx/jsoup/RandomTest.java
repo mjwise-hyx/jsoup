@@ -2,6 +2,7 @@ package com.heyx.jsoup;
 
 import com.heyx.jsoup.constant.LayerConst;
 import com.heyx.jsoup.constant.NodeConst;
+import org.apache.commons.math3.random.RandomDataGenerator;
 import org.junit.Test;
 
 import java.util.Random;
@@ -19,9 +20,9 @@ import java.util.Random;
  * */
 public class RandomTest {
 
-    private static final int START = LayerConst.MIN_LAYER_NUM;   //定义范围开始数字
+    private static final int START = -NodeConst.LINE_FACTOR_NUM;   //定义范围开始数字
 
-    private static final int END = LayerConst.MAX_LAYER_NUM; //定义范围结束数字
+    private static final int END = NodeConst.LINE_FACTOR_NUM; //定义范围结束数字
 
     @Test
     public void getRendom() {
@@ -30,9 +31,10 @@ public class RandomTest {
         Random random = new Random();
         //产生随机数
         int number = random.nextInt(END - START + 1) + START;
-
+        double generatorDouble = START +  new Random().nextDouble() * (END - START);
         //打印随机数
-        System.out.println("产生一个"+START+"到"+END+"之间的随机整数："+number);
+        System.out.println("产生一个"+START+"到"+END+"之间的随机整数："+ number);
+        System.out.println("产生一个"+START+"到"+END+"之间的double随机整数："+ generatorDouble);
 
     }
 
