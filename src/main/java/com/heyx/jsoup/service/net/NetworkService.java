@@ -84,7 +84,7 @@ public class NetworkService extends BaseService<Network, String> {
         while (lastRate < NodeConst.MIN_NODE_NUM - NodeConst.ERROR_NODE_RATE) {
 
             //1. 生成 一组用来计算的调节参数  a-正向调节 b-反向调节
-            HashMap<String, Integer> args = dynamicTuning(maxArgs, minArgs, adjust);
+            HashMap<String, Integer> args = dynamicTuning(network, maxArgs, minArgs, adjust);
             //2.计算结果
             String result = calc(network, startCode, args);
             int rate = historyService.compareResult(result, good);
@@ -110,18 +110,47 @@ public class NetworkService extends BaseService<Network, String> {
      * 动态调节
      *
      * @retur
+     * @param network
      * @param maxArgs
      * @param minArgs
      * @param adjust
      */
     public HashMap<String, Integer> dynamicTuning(
-            HashMap<String, Integer> maxArgs, HashMap<String, Integer> minArgs, int adjust) {
-        if (adjust == 1){
-
-        }else if(adjust == -1) {
-
+            Network network, HashMap<String, Integer> maxArgs, HashMap<String, Integer> minArgs, int adjust) {
+        if (network == null){
+            return null;
         }
-        return null;
+        HashMap<String, Integer> args = new HashMap<>();
+        List<Layer> layers = layerService.findAllByNetwork(network);
+        List<Layer> layerList = layerService.sortByParentId(layers);
+        for (Layer layer : layerList) {
+            List<Node> nodeList = nodeService.findAllByLayer(layer);
+            for (Node node : nodeList) {
+                List<Line> lines = lineService.findAllByOutput(node);
+                for (Line line : lines) {
+                    //TODO 动态获取随机值
+                    int random = 0;
+                    int START = -NodeConst.MAX;
+                    int END = NodeConst.MAX;
+                    if (adjust == 1){
+                        if (maxArgs != null){
+                            START = -NodeConst.MAX;
+                            END = NodeConst.MAX;
+                        }
+
+                    }else if(adjust == -1) {
+                        if (minArgs != null){
+                            START = -NodeConst.MAX;
+                            END = NodeConst.MAX;
+                        }
+                    }
+                    Integer value = line.getWeight() +  new Random().nextInt(END - START + 1) + START;
+                    args.put(line.getId(), value);
+                }
+            }
+        }
+
+        return args;
     }
 
     public void saveResult(Network network, HashMap<String, Integer> result) {

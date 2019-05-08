@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,7 +101,7 @@ public class NetworkTest {
     public void calcTest() {
         Optional<Network> networkOptional = networkService.findById("402881e56a8fe65e016a8fe672a50000");
         if (networkOptional.isPresent()) {
-            String result = networkService.calc(networkOptional.get(), "18100");
+            String result = networkService.calc(networkOptional.get(), "18100", new HashMap<>());
             System.out.println(result);
         }
     }
