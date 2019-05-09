@@ -5,10 +5,13 @@ import com.heyx.jsoup.dao.dot.HistoryRepo;
 import com.heyx.jsoup.entity.dot.History;
 import com.heyx.jsoup.service.BaseService;
 import com.heyx.jsoup.util.FormatUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @description:
@@ -108,7 +111,16 @@ public class HistoryService extends BaseService<History, String> {
         return rate;
     }
 
-    public List<History> findByCode(String code) {
-        return historyRepo.findByCode(code);
+    public Optional<History> findFirstByCode(String code) {
+        return historyRepo.findFirstByCode(code);
+    }
+
+    public String findGoodByCode(String code){
+        if (StringUtils.isBlank(code)){
+            return "";
+        }
+        Optional<History> oHistory = findFirstByCode(code);
+        return oHistory.map(history -> FormatUtils.bytesTobit(convertToSampleMatrix(history))).orElse("");
+
     }
 }

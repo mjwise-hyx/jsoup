@@ -48,27 +48,10 @@ public class ViewController {
 //        }
         List<Network> networkList = networkService.findAll();
         for (Network network : networkList) {
-            String lastCode = "19020";
-            int stepSize = layerService.getStepSize(network);
-
-            while (true) {
-                String nextCode = MathUtils.getCode(lastCode, stepSize + 1);
-                String good = "";
-                List<History> histories = historyService.findByCode(nextCode);
-                if (histories.size() == 1) {
-                    good = FormatUtils.bytesTobit  (historyService.convertToSampleMatrix(histories.get(0)));
-                }
-                if (StringUtils.isBlank(good)) {
-                    break;
-                }
-                NetworkThread networkThread = new NetworkThread(network, networkService, lastCode, good);
-                networkThread.start();
-                lastCode = nextCode;
-                break;
-            }
-
+            String code = "19020";
+            NetworkThread networkThread = new NetworkThread(network, networkService, code);
+            networkThread.start();
         }
-
         return "view/index";
     }
 }

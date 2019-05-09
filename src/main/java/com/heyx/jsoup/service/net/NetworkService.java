@@ -66,16 +66,28 @@ public class NetworkService extends BaseService<Network, String> {
      * <p>
      * 3.一半一半去调节，从大到小
      */
-    public void train(Network network, String startCode, String good) {
+    public void train(Network network, String startCode) {
         int adjust = 1;
         HashMap<String, Integer> maxArgs = null;
         HashMap<String, Integer> minArgs = null;
         int lastRate = 0;
         int count = 0; //用于记录连续的几次值
         int num = 0;
-        List<String> ids = new ArrayList<>();
+        if (network == null){
+            return;
+        }
         List<Layer> layers = layerService.findAllByNetwork(network);
         List<Layer> layerList = layerService.sortByParentId(layers);
+        int stepSize = layerList.get(0).getNodeNum() / NodeConst.MIN_NODE_NUM;
+        String endCode = MathUtils.getCode(startCode, stepSize);
+        String good = historyService.findGoodByCode(endCode);
+        if (StringUtils.isBlank(good)){
+            System.out.println("========------GOOD------=========------IS-------=========-----NONE------=========");
+            return;
+        }
+        List<History> histories = historyService.findAllByCodeBetween(startCode, endCode);
+        String input = historyService.convertToSampleMatrixWithStep(histories, stepSize);
+        List<String> ids = getNodeAndLineIDs(layerList);
         while ((lastRate < NodeConst.MIN_NODE_NUM - NodeConst.ERROR_NODE_RATE) ||
                 (num < TrainConst.MAX_TRAIN_NUM) ) {
 
@@ -85,7 +97,7 @@ public class NetworkService extends BaseService<Network, String> {
             //1. 生成 一组用来计算的调节参数  a-正向调节 b-反向调节
             HashMap<String, Integer> args = dynamicTuning(ids, maxArgs, minArgs, adjust);
             //2.计算结果
-            String result = calc(network, layerList, startCode, args);
+            String result = calc(network, layerList, input, args);
             int rate = historyService.compareResult(result, good);
             if (rate < lastRate) {
                 count++;
@@ -110,6 +122,21 @@ public class NetworkService extends BaseService<Network, String> {
 
         }
         System.out.println( "============第 "+startCode+" 期数据，训练结束了！ =============");
+    }
+
+    private List<String> getNodeAndLineIDs(List<Layer> layerList) {
+        List<String> list = new ArrayList<>();
+        for (Layer layer : layerList) {
+            List<Node> nodeList = nodeService.findAllByLayer(layer);
+            for (Node node : nodeList) {
+                List<Line> lines = lineService.findAllByOutput(node);
+                for (Line line : lines) {
+                    list.add(line.getId());
+                }
+                list.add(node.getId());
+            }
+        }
+        return list;
     }
 
     /**
@@ -200,16 +227,11 @@ public class NetworkService extends BaseService<Network, String> {
     /**
      * 计算一次
      */
-    public String calc(Network network, List<Layer> layerList, String startCode,HashMap<String, Integer> args) {
+    public String calc(Network network, List<Layer> layerList, String input,HashMap<String, Integer> args) {
         if (null == network) {
             return "";
         }
         int inputNum = layerList.get(0).getNodeNum();
-        int stepSize = inputNum / NodeConst.MIN_NODE_NUM;
-        //获得输入层的值
-        String endCode = MathUtils.getCode(startCode, stepSize);
-        List<History> histories = historyService.findAllByCodeBetween(startCode, endCode);
-        String input = historyService.convertToSampleMatrixWithStep(histories, stepSize);
         Map<Integer, Double> lastLayerVlaue = new HashMap<>();
         for (Layer layer : layerList) {
             Map<Integer, Double> valueMap = new HashMap<>();

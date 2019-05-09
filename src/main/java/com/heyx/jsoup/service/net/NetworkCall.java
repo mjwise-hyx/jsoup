@@ -1,8 +1,10 @@
 package com.heyx.jsoup.service.net;
 
+import com.heyx.jsoup.entity.net.Layer;
 import com.heyx.jsoup.entity.net.Network;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -24,6 +26,6 @@ public class NetworkCall implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        return networkService.calc(network, startCode,new HashMap<>());
+        return "";
     }
 }

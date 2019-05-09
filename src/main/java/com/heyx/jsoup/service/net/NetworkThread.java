@@ -14,20 +14,17 @@ public class NetworkThread extends Thread {
 
     private NetworkService networkService;
 
-    private String good;
 
     public NetworkThread(Network network,
                          NetworkService networkService,
-                         String startCode,
-                         String good){
+                         String startCode){
         this.network = network;
         this.networkService = networkService;
         this.startCode = startCode;
-        this.good = good;
     }
 
     @Override
     public void run() {
-        networkService.train(network, startCode, good);
+        networkService.train(network, startCode);
     }
 }

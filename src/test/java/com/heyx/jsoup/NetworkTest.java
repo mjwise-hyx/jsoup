@@ -97,15 +97,6 @@ public class NetworkTest {
 
     }
 
-    @Test
-    public void calcTest() {
-        Optional<Network> networkOptional = networkService.findById("402881e56a8fe65e016a8fe672a50000");
-        if (networkOptional.isPresent()) {
-            String result = networkService.calc(networkOptional.get(), "18100", new HashMap<>());
-            System.out.println(result);
-        }
-    }
-
 //    @Test
 //    @Synchronized
 //    public void calcThreadTest() {
