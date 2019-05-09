@@ -11,6 +11,7 @@ import com.heyx.jsoup.service.dot.HistoryService;
 import com.heyx.jsoup.util.CountStringUtils;
 import com.heyx.jsoup.util.FormatUtils;
 import com.heyx.jsoup.util.MathUtils;
+import kotlin.jvm.Synchronized;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,9 @@ public class NetworkService extends BaseService<Network, String> {
         int lastRate = 0;
         int count = 0; //用于记录连续的几次值
         int num = 0;
+        List<String> ids = new ArrayList<>();
+        List<Layer> layers = layerService.findAllByNetwork(network);
+        List<Layer> layerList = layerService.sortByParentId(layers);
         while ((lastRate < NodeConst.MIN_NODE_NUM - NodeConst.ERROR_NODE_RATE) ||
                 (num < TrainConst.MAX_TRAIN_NUM) ) {
 
@@ -79,9 +83,9 @@ public class NetworkService extends BaseService<Network, String> {
             System.out.println("-正在计算第 " + startCode +" 期,第 "+ num +" 次的数据");
 
             //1. 生成 一组用来计算的调节参数  a-正向调节 b-反向调节
-            HashMap<String, Integer> args = dynamicTuning(network, maxArgs, minArgs, adjust);
+            HashMap<String, Integer> args = dynamicTuning(ids, maxArgs, minArgs, adjust);
             //2.计算结果
-            String result = calc(network, startCode, args);
+            String result = calc(network, layerList, startCode, args);
             int rate = historyService.compareResult(result, good);
             if (rate < lastRate) {
                 count++;
@@ -98,7 +102,7 @@ public class NetworkService extends BaseService<Network, String> {
                 minArgs = args;
             } else {
                 //说明调节有效果，进行保存
-                saveResult(network, args);
+                saveResult(layerList, args);
                 adjust = 1;
                 maxArgs = args;
             }
@@ -112,80 +116,45 @@ public class NetworkService extends BaseService<Network, String> {
      * 动态调节
      *
      * @return 返回每个节点的调节结果
-     * @param network 网络
      * @param maxArgs 上一次优的结果
      * @param minArgs 上一次不好的结果
      * @param adjust 调节方向
      */
-    public HashMap<String, Integer> dynamicTuning(
-            Network network, HashMap<String, Integer> maxArgs, HashMap<String, Integer> minArgs, int adjust) {
-        if (network == null){
-            return new HashMap<>();
-        }
+    public synchronized HashMap<String, Integer> dynamicTuning(
+            List<String> list, HashMap<String, Integer> maxArgs, HashMap<String, Integer> minArgs, int adjust) {
         HashMap<String, Integer> args = new HashMap<>();
-        List<Layer> layers = layerService.findAllByNetwork(network);
-        List<Layer> layerList = layerService.sortByParentId(layers);
-        for (Layer layer : layerList) {
-            List<Node> nodeList = nodeService.findAllByLayer(layer);
-            for (Node node : nodeList) {
-                int NODE_START = -NodeConst.MAX;
-                int NODE_END = NodeConst.MAX;
-                if (adjust == 1){
-                    if (maxArgs != null){
-                        int value = maxArgs.get(node.getId());
-                        if( value >= 0){
-                            NODE_START = value;
-                        }else {
-                            NODE_END = value;
-                        }
-                    }
-                }else if(adjust == -1) {
-                    if (maxArgs != null){
-                        int value = maxArgs.get(node.getId());
-                        if( value >= 0){
-                            NODE_END = value;
-                        }else {
-                            NODE_START = value;
-                        }
+        for (String id : list) {
+            int NODE_START = -NodeConst.MAX;
+            int NODE_END = NodeConst.MAX;
+            if (adjust == 1){
+                if (maxArgs != null){
+                    int value = maxArgs.get(id);
+                    if( value >= 0){
+                        NODE_START = value;
+                    }else {
+                        NODE_END = value;
                     }
                 }
-                Integer bias = node.getBias() +  new Random().nextInt(NODE_END - NODE_START + 1) + NODE_START;
-                args.put(node.getId(), bias);
-                List<Line> lines = lineService.findAllByOutput(node);
-                for (Line line : lines) {
-                    int LINE_START = -NodeConst.MAX;
-                    int LINE_END = NodeConst.MAX;
-                    if (adjust == 1){
-                        if (maxArgs != null){
-                            int value = maxArgs.get(node.getId());
-                            if( value >= 0){
-                                LINE_START = value;
-                            }else {
-                                LINE_END = value;
-                            }
-                        }
-                    }else if(adjust == -1) {
-                        if (maxArgs != null){
-                            int value = maxArgs.get(node.getId());
-                            if( value >= 0){
-                                LINE_END = value;
-                            }else {
-                                LINE_START = value;
-                            }
-                        }
+            }else if(adjust == -1) {
+                if (maxArgs != null){
+                    int value = maxArgs.get(id);
+                    if( value >= 0){
+                        NODE_END = value;
+                    }else {
+                        NODE_START = value;
                     }
-                    Integer weight = line.getWeight() +  new Random().nextInt(LINE_END - LINE_START + 1) + LINE_START;
-                    args.put(line.getId(), weight);
                 }
             }
+            int NODE_BOUND = NODE_END - NODE_START + 1;
+            args.put(id, new Random().nextInt(NODE_BOUND) + NODE_START);
+            System.out.println("NODE_END " + NODE_END);
+            System.out.println("NODE_START " + NODE_START);
+            System.out.println("NODE_BOUND " + NODE_BOUND);
         }
-
         return args;
     }
 
-    public void saveResult(Network network, HashMap<String, Integer> result) {
-        List<Layer> layers = layerService.findAllByNetwork(network);
-        List<Layer> layerList = layerService.sortByParentId(layers);
+    public void saveResult(List<Layer> layerList, HashMap<String, Integer> result) {
         for (Layer layer : layerList) {
             List<Node> nodeList = nodeService.findAllByLayer(layer);
             List<Node> changeNodeList = new ArrayList<>();
@@ -196,11 +165,13 @@ public class NetworkService extends BaseService<Network, String> {
                 int lineNum = 0;
                 for (Line line : lines) {
                     Integer weight = result.get(line.getId());
-                    if (null == weight) {
+                    if (null != weight) {
+                        weight += line.getWeight();
                         line.setWeight(weight);
                         changeLineList.add(line);
+                        lineNum++;
                     }
-                    lineNum++;
+
                     if (lineNum == 100) {
                         lineService.saveAll(changeLineList);
                         changeLineList.clear();
@@ -209,11 +180,12 @@ public class NetworkService extends BaseService<Network, String> {
                 }
                 lineService.saveAll(changeLineList);
                 Integer bias = result.get(node.getId());
-                if (null == bias) {
+                if (null != bias) {
+                    bias += node.getBias();
                     node.setBias(bias);
                     changeNodeList.add(node);
+                    nodeNum++;
                 }
-                nodeNum++;
                 if (nodeNum == 100) {
                     nodeService.saveAll(changeNodeList);
                     changeNodeList.clear();
@@ -228,12 +200,10 @@ public class NetworkService extends BaseService<Network, String> {
     /**
      * 计算一次
      */
-    public String calc(Network network, String startCode,HashMap<String, Integer> args) {
+    public String calc(Network network, List<Layer> layerList, String startCode,HashMap<String, Integer> args) {
         if (null == network) {
             return "";
         }
-        List<Layer> layers = layerService.findAllByNetwork(network);
-        List<Layer> layerList = layerService.sortByParentId(layers);
         int inputNum = layerList.get(0).getNodeNum();
         int stepSize = inputNum / NodeConst.MIN_NODE_NUM;
         //获得输入层的值
