@@ -11,7 +11,6 @@ import com.heyx.jsoup.service.dot.HistoryService;
 import com.heyx.jsoup.util.CountStringUtils;
 import com.heyx.jsoup.util.FormatUtils;
 import com.heyx.jsoup.util.MathUtils;
-import kotlin.jvm.Synchronized;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

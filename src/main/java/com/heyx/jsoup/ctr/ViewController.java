@@ -48,7 +48,7 @@ public class ViewController {
 //        }
         List<Network> networkList = networkService.findAll();
         for (Network network : networkList) {
-            String code = "19020";
+            String code = "03001";
             NetworkThread networkThread = new NetworkThread(network, networkService, code);
             networkThread.start();
         }
