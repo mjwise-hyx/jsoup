@@ -1,8 +1,6 @@
 package com.heyx.jsoup;
 
-import com.heyx.jsoup.constant.LayerConst;
 import com.heyx.jsoup.constant.NodeConst;
-import org.apache.commons.math3.random.RandomDataGenerator;
 import org.junit.Test;
 
 import java.util.Random;

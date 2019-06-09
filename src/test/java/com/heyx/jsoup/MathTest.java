@@ -2,7 +2,6 @@ package com.heyx.jsoup;
 
 import com.heyx.jsoup.util.MathUtils;
 import org.junit.Test;
-import org.opencv.core.Mat;
 
 //求排列数组合数
 public class MathTest {

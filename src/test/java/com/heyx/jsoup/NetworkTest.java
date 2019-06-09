@@ -2,18 +2,15 @@ package com.heyx.jsoup;
 
 import com.heyx.jsoup.entity.net.Info;
 import com.heyx.jsoup.entity.net.Layer;
-import com.heyx.jsoup.entity.net.Network;
 import com.heyx.jsoup.entity.net.Node;
 import com.heyx.jsoup.service.net.*;
 import com.heyx.jsoup.util.CountStringUtils;
-import kotlin.jvm.Synchronized;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
