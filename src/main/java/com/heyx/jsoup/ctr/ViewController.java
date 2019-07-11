@@ -35,4 +35,10 @@ public class ViewController {
         }
         return "view/index";
     }
+
+
+    @GetMapping("/test")
+    public String test() {
+        return "view/test1";
+    }
 }

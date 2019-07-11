@@ -1,7 +1,15 @@
 server:
   port: 1234
+  servlet:
+    context-path: /
 
 spring:
+  thymeleaf:
+    encoding: utf-8
+    mode: HTML5
+    cache: false
+    servlet:
+      content-type: text/html
   jpa:
     database: mysql
     show-sql: false

@@ -1,10 +1,6 @@
 package com.heyx.jsoup.service.net;
 
-import com.heyx.jsoup.entity.net.Layer;
 import com.heyx.jsoup.entity.net.Network;
-
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 /**

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>模型展示</title>
+    <head data-th-replace="~{head/bimviz_css::onLoadBimvizCSS}"></head>
+    <head data-th-replace="~{head/bimviz_js::onLoadBimvizJS}"></head>
+    <head data-th-replace="~{head/basic_css::onLoadBasicCSS}"></head>
+    <head data-th-replace="~{head/basic_js::onLoadBasicJS}"></head>
+</head>
+<body>
+<div id="viewport"></div>
+<div id="messages"></div>
+</body>
+<script>
+    layui.use('layer', function () {
+        var layer = layui.layer
+            ,$ = layui.jquery;
+
+        var projId = "57d467ee-4940-4078-904a-3aaa822e5001";
+        var bimEngine = new BIMVIZ.RenderEngine({
+            projectId: projId,
+            renderDomId: 'viewport',
+            ip: "api.bimcloud.uv2z.cn",
+            port: 80,
+            key: 'B3056CC9-13DB-4fcc-9FC3-6604D93304F8',
+            resizeMode: 'fullpage',
+            resourcePath: '../public/bimsdk/sdk/viz/data/',  //资源目录
+            axis: {
+                show: false //是否显示坐标轴
+            }
+        });
+        // 消息输出控件，包括调试信息，进度信息
+        var msgControl = new BIMVIZ.UI.DefaultMessageControl(bimEngine, 'messages');
+
+        // 工具栏
+        var toolbar = new BIMVIZ.UI.DefaultToolBar(bimEngine);
+
+        // 添加文件控件
+        var fileControl = new BIMVIZ.UI.DefaultFileControl("文件", "fa-file-o");
+        toolbar.addControl(fileControl);
+
+        // 添加场景树控件
+        var spaceControl = new BIMVIZ.UI.DefaultTreesHighlightControl("场景树", "fa-tree");
+        toolbar.addControl(spaceControl);
+
+        // 添加类型控件
+        var domainControl = new BIMVIZ.UI.DefaultDomainControl("类型", "fa-map-o");
+        toolbar.addControl(domainControl);
+
+        // 添加属性控件
+        var propertyControl = new BIMVIZ.UI.DefaultPropertyControl("属性", "fa-info-circle");
+        toolbar.addControl(propertyControl);
+
+        // 添加搜索控件
+        var searchControl = new BIMVIZ.UI.DefaultSearchControl("搜索", "fa-search");
+        toolbar.addControl(searchControl);
+
+        // 添加标注控件
+        // 或者可以调用带编辑功能的版本 BIMVIZ.UI.DefaultMarkControl
+        var markControl = new BIMVIZ.UI.DefaultMarkControl("标注", "fa-map-marker");
+        toolbar.addControl(markControl);
+
+        // 添加楼层控件
+        var storeyControl = new BIMVIZ.UI.DefaultBuildingStoreyControl("楼层", "fa-list");
+        toolbar.addControl(storeyControl);
+
+        // 场景浏览参数设置
+        var roamingControl = new BIMVIZ.UI.DefaultRoamingSettingControl("漫游控制", "fa-send");
+        toolbar.addControl(roamingControl);
+
+        // 数据查询分析
+        var queryControl = new BIMVIZ.UI.DefaultDatabaseQueryControl("分析查询", "fa-database");
+        toolbar.addControl(queryControl);
+
+        // 添加场景树控件
+        var visibleControl = new BIMVIZ.UI.DefaultTreesVisibilityControl("可见树", "fa-sitemap");
+        toolbar.addControl(visibleControl);
+
+        // 添加选择集控件
+        var selectionSetControl = new BIMVIZ.UI.DefaultSelectionSetControl("选择集", "fa-th-large");
+        toolbar.addControl(selectionSetControl);
+
+        // 相机书签控件
+        var cameraBookmarkControl = new BIMVIZ.UI.DefaultCameraBookmarkControl("相机书签", "fa-camera");
+        toolbar.addControl(cameraBookmarkControl);
+
+        // 常规剖切控件
+        var fixedClipControl = new BIMVIZ.UI.DefaultFixedClipControl("常规剖切", "fa fa-columns");
+        toolbar.addControl(fixedClipControl);
+
+        //测量控件
+        var measureControl = new BIMVIZ.UI.DefaultMeasureControl("测量", "fa fa-object-ungroup");
+        toolbar.addControl(measureControl);
+
+        // 框选控件
+        var rectSelectControl = new BIMVIZ.UI.DefaultRectSelectControl("框选", "fa fa-hand-stop-o");
+        toolbar.addControl(rectSelectControl);
+
+        // HTML标记控件
+        var htmlMarkerControl = new BIMVIZ.UI.DefaultHtmlMarkerControl("HTML标记","fa fa-flag");
+        toolbar.addControl(htmlMarkerControl);
+
+        // 文件动态加载控件
+        var customTreeControl = new BIMVIZ.UI.DefaultFileLoadControl("自定义树", "fa fa-files-o");
+        toolbar.addControl(customTreeControl);
+
+        // 轴网显示控件
+        var floorGridControl = new BIMVIZ.UI.DefaultStoreyGridControl("轴网显示", "fa fa-table");
+        toolbar.addControl(floorGridControl);
+
+        // space显示控件
+        var bimSpaceControl = new BIMVIZ.UI.DefaultBimSpaceControl("Space显示", "fa fa-cube");
+        toolbar.addControl(bimSpaceControl);
+
+        //二维图纸控件
+        var planViewControl = new BIMVIZ.UI.DefaultPlanViewControl("二维图纸", "fa fa-newspaper-o");
+        toolbar.addControl(planViewControl);
+
+        //批注控件
+        var markupControl = new BIMVIZ.UI.DefaultMarkupControl("批注", "fa fa-pencil");
+        toolbar.addControl(markupControl);
+
+        bimEngine.start();
+
+        bimEngine.addListener(BIMVIZ.EVENT.OnSceneLoadCompleted, function (event) {
+            console.log('加载完成......');
+            getModelData();
+        });
+
+        function getModelData(){
+            $.ajax({
+                url: '/api/component/beam/getColor',
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    if(res.statusCode === 200){
+                        $.each(res.data, function (index, item) {
+                            if(item.elementId){
+                                bimEngine.changeElementRGBA(item.elementId, [0, 0.95, 0.7960, 1.0]);
+                            }
+                        })
+                    }
+                }
+            })
+        }
+
+    })
+
+</script>
+</html>
